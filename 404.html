@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Not Found | {{ site_name }}{% endblock %}
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="empty">
+      <div class="empty__title">Page not found</div>
+      <div class="empty__desc">The page you’re looking for doesn’t exist.</div>
+      <a class="btn btn--primary" href="{{ url_for('home') }}">Go home</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

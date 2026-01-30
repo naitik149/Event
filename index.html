@@ -1,0 +1,276 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ site_name }} | College Events{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="container hero__inner">
+    <div class="hero__copy">
+      <div class="badge">Centralized • Clear • Always up to date</div>
+      <h1 class="hero__title">All your college events and hackathons, in one place.</h1>
+      <p class="hero__subtitle">
+        View schedules, venues, rules, coordinator contacts, and registration links—without jumping across platforms.
+      </p>
+      <div class="hero__cta">
+        <a class="btn btn--primary" href="#events">Explore events</a>
+        <a class="btn btn--ghost" href="#how">How it works</a>
+      </div>
+      <div class="hero__stats">
+        <div class="stat">
+          <div class="stat__value">{{ events|length }}</div>
+          <div class="stat__label">Active listings</div>
+        </div>
+        <div class="stat">
+          <div class="stat__value">1</div>
+          <div class="stat__label">Clean dashboard</div>
+        </div>
+        <div class="stat">
+          <div class="stat__value">0</div>
+          <div class="stat__label">Info scattered</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero__panel">
+      <div class="panel">
+        <div class="panel__title">What you’ll find</div>
+        <div class="panel__items">
+          <div class="panel__item">
+            <div class="panel__icon">📍</div>
+            <div>
+              <div class="panel__itemTitle">Venue & timing</div>
+              <div class="panel__itemDesc">Know exactly where to be and when.</div>
+            </div>
+          </div>
+          <div class="panel__item">
+            <div class="panel__icon">🧾</div>
+            <div>
+              <div class="panel__itemTitle">Rules</div>
+              <div class="panel__itemDesc">No last-minute confusion—clear guidelines.</div>
+            </div>
+          </div>
+          <div class="panel__item">
+            <div class="panel__icon">☎️</div>
+            <div>
+              <div class="panel__itemTitle">Coordinators</div>
+              <div class="panel__itemDesc">Direct contact for quick clarifications.</div>
+            </div>
+          </div>
+          <div class="panel__item">
+            <div class="panel__icon">🔗</div>
+            <div>
+              <div class="panel__itemTitle">Registration links</div>
+              <div class="panel__itemDesc">One click to sign up before deadlines.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="events" class="section">
+  <div class="container">
+    <div class="section__head">
+      <h2 class="section__title">Events</h2>
+      <p class="section__desc">Choose an event to view full schedule, rules, contacts, and registration.</p>
+    </div>
+
+    <div class="grid">
+      {% for event in events %}
+      <a class="card" href="{{ url_for('home') }}?event={{ event.slug }}#event-details">
+        <div class="card__top">
+          <div class="pill">{{ event.type }}</div>
+          <div class="card__deadline">Deadline: {{ event.registration_deadline }}</div>
+        </div>
+        <div class="card__title">{{ event.title }}</div>
+        <div class="card__tagline">{{ event.tagline }}</div>
+        <div class="card__meta">
+          <div class="meta">
+            <div class="meta__k">Dates</div>
+            <div class="meta__v">{{ event.dates }}</div>
+          </div>
+          <div class="meta">
+            <div class="meta__k">Venue</div>
+            <div class="meta__v">{{ event.venue }}</div>
+          </div>
+        </div>
+        <div class="card__action">View details →</div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<section id="event-details" class="section">
+  <div class="container">
+    <div class="section__head">
+      <h2 class="section__title">Event details</h2>
+      <p class="section__desc">Everything you need—schedule, rules, coordinators, and registration.</p>
+    </div>
+
+    {% if selected_event %}
+    <div class="eventHead">
+      <div>
+        <div class="pill pill--soft">{{ selected_event.type }}</div>
+        <h3 class="eventHead__title">{{ selected_event.title }}</h3>
+        <p class="eventHead__tagline">{{ selected_event.tagline }}</p>
+      </div>
+      <div class="eventHead__actions">
+        <a class="btn btn--primary" href="{{ selected_event.registration_link }}" target="_blank" rel="noopener noreferrer">Register</a>
+        <a class="btn btn--ghost" href="#events">Browse events</a>
+      </div>
+    </div>
+
+    <div class="eventGrid">
+      <div class="card card--pad">
+        <div class="card__titleSm">Quick info</div>
+        <div class="kv">
+          <div class="kv__row">
+            <div class="kv__k">Dates</div>
+            <div class="kv__v">{{ selected_event.dates }}</div>
+          </div>
+          <div class="kv__row">
+            <div class="kv__k">Venue</div>
+            <div class="kv__v">{{ selected_event.venue }}</div>
+          </div>
+          <div class="kv__row">
+            <div class="kv__k">Registration deadline</div>
+            <div class="kv__v">{{ selected_event.registration_deadline }}</div>
+          </div>
+          <div class="kv__row">
+            <div class="kv__k">Link</div>
+            <div class="kv__v"><a class="link" href="{{ selected_event.registration_link }}" target="_blank" rel="noopener noreferrer">Open registration</a></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card card--pad">
+        <div class="card__titleSm">Highlights</div>
+        <ul class="list">
+          {% for item in selected_event.highlights %}
+          <li class="list__item">{{ item }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="card card--pad eventSpan">
+        <div class="card__titleSm">Schedule</div>
+        <div class="schedule">
+          {% for block in selected_event.schedule %}
+          <div class="schedule__day">
+            <div class="schedule__head">
+              <div class="schedule__label">{{ block.day }}</div>
+              <div class="schedule__date">{{ block.date }}</div>
+            </div>
+            <div class="schedule__items">
+              {% for item in block.items %}
+              <div class="scheduleItem">
+                <div class="scheduleItem__time">{{ item.time }}</div>
+                <div class="scheduleItem__main">
+                  <div class="scheduleItem__title">{{ item.title }}</div>
+                  <div class="scheduleItem__loc">{{ item.location }}</div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="card card--pad">
+        <div class="card__titleSm">Rules</div>
+        <ul class="list">
+          {% for rule in selected_event.rules %}
+          <li class="list__item">{{ rule }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="card card--pad">
+        <div class="card__titleSm">Coordinators</div>
+        <div class="people">
+          {% for c in selected_event.coordinators %}
+          <div class="person">
+            <div class="person__avatar">{{ c.name[:1] }}</div>
+            <div class="person__main">
+              <div class="person__name">{{ c.name }}</div>
+              <div class="person__role">{{ c.role }}</div>
+              <div class="person__meta">
+                <div><span class="muted">Phone:</span> {{ c.phone }}</div>
+                <div><span class="muted">Email:</span> {{ c.email }}</div>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="empty">
+      <div class="empty__title">Select an event to view details</div>
+      <div class="empty__desc">Click any event card above to see schedule, rules, coordinators, and registration.</div>
+      <a class="btn btn--primary" href="#events">Go to events</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<section id="how" class="section section--muted">
+  <div class="container">
+    <div class="section__head">
+      <h2 class="section__title">How it works</h2>
+      <p class="section__desc">Simple structure, fast access, and a clean layout for every event.</p>
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step__num">01</div>
+        <div class="step__title">Browse events</div>
+        <div class="step__desc">See type, dates, venue, and deadlines at a glance.</div>
+      </div>
+      <div class="step">
+        <div class="step__num">02</div>
+        <div class="step__title">Open details</div>
+        <div class="step__desc">Read rules, full schedule, and contact the coordinators.</div>
+      </div>
+      <div class="step">
+        <div class="step__num">03</div>
+        <div class="step__title">Register</div>
+        <div class="step__desc">Use direct registration links to avoid missing deadlines.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="section">
+  <div class="container">
+    <div class="section__head">
+      <h2 class="section__title">Contact</h2>
+      <p class="section__desc">Want to add an event listing? Share details with the student council.</p>
+    </div>
+
+    <div class="contact">
+      <div class="contact__card">
+        <div class="contact__title">Student Council Desk</div>
+        <div class="contact__row">
+          <span class="contact__k">Email</span>
+          <span class="contact__v">events@college.edu</span>
+        </div>
+        <div class="contact__row">
+          <span class="contact__k">Office</span>
+          <span class="contact__v">Admin Block, Room 101</span>
+        </div>
+        <div class="contact__row">
+          <span class="contact__k">Hours</span>
+          <span class="contact__v">Mon–Fri, 10:00–16:00</span>
+        </div>
+      </div>
+      <div class="contact__note">
+        Tip: Keep event updates consistent—dates, venues, deadlines, and coordinator contacts.
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
